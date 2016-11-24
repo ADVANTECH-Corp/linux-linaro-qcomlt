@@ -2,6 +2,9 @@
 # General architecture dependent options
 #
 
+config ARCH_ADVANTECH
+	bool "Support Advantech board"
+
 config KEXEC_CORE
 	bool
 
