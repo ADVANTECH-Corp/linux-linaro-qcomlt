@@ -1,0 +1,141 @@
+/* msm8916-pins.dtsi */
+
+&msmgpio {
+
+	blsp1_uart2_fc_default: blsp1_uart2_fc_default {
+		pinmux {
+			function = "blsp_uart2";
+			//	TX, RX, CTS_N, RTS_N
+			pins = "gpio4", "gpio5",
+			       "gpio6", "gpio7";
+		};
+		pinconf {
+			pins = "gpio4", "gpio5",
+			       "gpio6", "gpio7";
+			drive-strength = <16>;
+			bias-disable;
+		};
+	};
+
+	blsp1_uart2_fc_sleep: blsp1_uart2_fc_sleep {
+		pinmux {
+			function = "gpio";
+			pins = "gpio4", "gpio5",
+			       "gpio6", "gpio7";
+		};
+		pinconf {
+			pins = "gpio4", "gpio5",
+			       "gpio6", "gpio7";
+			drive-strength = <2>;
+			bias-pull-down;
+		};
+	};
+
+	i2c3_default: i2c3_default {
+		pinmux {
+			function = "blsp_i2c3";
+			pins = "gpio10", "gpio11";
+		};
+		pinconf {
+			pins = "gpio10", "gpio11";
+			drive-strength = <16>;
+			bias-disable = <0>;
+		};
+	};
+
+	i2c3_sleep: i2c3_sleep {
+		pinmux {
+			function = "gpio";
+			pins = "gpio10", "gpio11";
+		};
+		pinconf {
+			pins = "gpio10", "gpio11";
+			drive-strength = <2>;
+			bias-disable = <0>;
+		};
+	};
+
+	i2c0_default: i2c0_default {
+		pinmux {
+			function = "cci_i2c";
+			pins = "gpio29", "gpio30";
+		};
+		pinconf {
+			pins = "gpio29", "gpio30";
+			drive-strength = <16>;
+			bias-disable = <0>;
+		};
+	};
+
+	i2c0_sleep: i2c0_sleep {
+		pinmux {
+			function = "gpio";
+			pins = "gpio29", "gpio30";
+		};
+		pinconf {
+			pins = "gpio29", "gpio30";
+			drive-strength = <2>;
+			bias-disable = <0>;
+		};
+	};
+
+	sdhc2_wp_pin {
+		sdc2_wp_on: wp_on {
+			pinmux {
+				function = "gpio";
+				pins = "gpio121";
+			};
+			pinconf {
+				pins = "gpio121";
+				drive-strength = <2>;
+				bias-pull-up;
+			};
+		};
+		sdc2_wp_off: wp_off {
+			pinmux {
+				function = "gpio";
+				pins = "gpio121";
+			};
+			pinconf {
+				pins = "gpio121";
+				drive-strength = <2>;
+				bias-disable;
+			};
+		};
+	};
+};
+
+/* msm8916.dtsi */
+
+&soc {
+		blsp_i2c3: i2c@78b7000 {
+			compatible = "qcom,i2c-qup-v2.2.1";
+			reg = <0x78b7000 0x1000>;
+			interrupts = <GIC_SPI 97 0>;
+			clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+				<&gcc GCC_BLSP1_QUP3_I2C_APPS_CLK>;
+			clock-names = "iface", "core";
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&i2c3_default>;
+			pinctrl-1 = <&i2c3_sleep>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
+
+		cci_i2c0: i2c@1b0c000 {
+			compatible = "qcom,i2c-qup-v2.2.1";
+			reg = <0x1b0c000 0x1000>;
+			interrupts = <GIC_SPI 50 0>;
+			//FIXME: The clocks are invalid for I2C2
+			clocks = <&gcc GCC_BLSP1_AHB_CLK>,
+				<&gcc GCC_BLSP1_QUP3_I2C_APPS_CLK>;
+			clock-names = "iface", "core";
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&i2c0_default>;
+			pinctrl-1 = <&i2c0_sleep>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "disabled";
+		};
+};
