@@ -1,5 +1,0 @@
-0004_System_001_Add_to_build_proc_board_file_and_information.patch -p1
-0024_Watchdog_001_Add_watchdog_driver_for_external_watchdog.patch -p1
-smsc75xx_net_testmode.patch -p1
-Update-DTS-for-RSB-4760.patch -p1
-disable_cooling_device.patch -p1
