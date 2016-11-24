@@ -30,6 +30,10 @@
 #include <linux/usb/usbnet.h>
 #include <linux/slab.h>
 #include "smsc75xx.h"
+// Advantech
+#include <linux/proc_fs.h>
+struct usbnet *gdev = NULL;
+struct proc_dir_entry *proc_entry = NULL;
 
 #define SMSC_CHIPNAME			"smsc75xx"
 #define SMSC_DRIVER_VERSION		"1.0.0"
@@ -809,6 +813,46 @@ static int smsc75xx_set_mac_address(struct usbnet *dev)
 	return ret;
 }
 
+// [Advantech] Function to write PHY registers for test modes
+static int smsc75xx_proc_write(struct file *file, const char __user * buffer,
+				unsigned long count, loff_t *f_pos)
+{
+	char cmd[8];
+	u16 val;
+	int ret;
+	struct usbnet *dev = (struct usbnet *) PDE_DATA(file_inode(file));
+	if (dev == NULL) {
+		printk("smsc75xx_proc_write: no data!");
+		return -EFAULT;
+	}
+
+	ret = copy_from_user(cmd, buffer, count);
+	if (ret) {
+		printk("smsc75xx_proc_write: no input buffer!");
+		return -EFAULT;
+	}
+
+	if (strstr(cmd, "1"))
+		val = (TEST_MODE_1 | ADVERTISE_1000FULL | ADVERTISE_1000HALF);
+	else if (strstr(cmd, "2"))
+		val = (TEST_MODE_2 | ADVERTISE_1000FULL | ADVERTISE_1000HALF);
+	else if (strstr(cmd, "3"))
+		val = (TEST_MODE_3 | ADVERTISE_1000FULL | ADVERTISE_1000HALF);
+	else if (strstr(cmd, "4"))
+		val = (TEST_MODE_4 | ADVERTISE_1000FULL | ADVERTISE_1000HALF);
+	else
+		return 0;
+
+	smsc75xx_mdio_write(dev->net, dev->mii.phy_id, MII_CTRL1000, val);
+
+	return count;
+}
+
+static struct file_operations proc_net_fops =
+{
+	.write		= smsc75xx_proc_write,
+};
+
 static int smsc75xx_phy_initialize(struct usbnet *dev)
 {
 	int bmcr, ret, timeout = 0;
@@ -860,6 +904,15 @@ static int smsc75xx_phy_initialize(struct usbnet *dev)
 	mii_nway_restart(&dev->mii);
 
 	netif_dbg(dev, ifup, dev->net, "phy initialised successfully\n");
+
+	// [Advantech] Add proc entry for net_testmode
+	if (proc_entry) {
+		proc_remove(proc_entry);
+	}
+	gdev = dev;
+	proc_entry = proc_create_data("net_testmode", 0777, NULL,
+					&proc_net_fops, gdev);
+
 	return 0;
 }
 
