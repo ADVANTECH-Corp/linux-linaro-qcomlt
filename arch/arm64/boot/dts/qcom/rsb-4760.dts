@@ -21,8 +21,8 @@
 	qcom,board-id = <QCOM_BRD_ID(SBC, 1, 0) QCOM_BRD_SUBTYPE_DEFAULT>;
 
 	board {
-		compatible = "adv,proc-board";
+		compatible = "proc-board";
 		board-type = "RSB-4760";
-		board-cpu = "DualQuad";
+		board-cpu = "Quad 64-bit";
 	};
 };
