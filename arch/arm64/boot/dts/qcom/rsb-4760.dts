@@ -14,6 +14,7 @@
 /dts-v1/;
 #include <dt-bindings/arm/qcom-ids.h>
 #include "advantech-apq8016-sbc.dtsi"
+#include "advantech-rsb-4760-soc-pins.dtsi"
 
 / {
 	model = "Qualcomm Technologies, Inc. APQ 8016 SBC";
@@ -24,5 +25,35 @@
 		compatible = "proc-board";
 		board-type = "RSB-4760";
 		board-cpu = "Quad 64-bit";
+	};
+
+	soc {
+		i2c@1b0c000 {
+			label = "I2C2";
+			//status = "okay";
+		};
+
+		i2c@78b7000 {
+			label = "I2C4";
+			status = "okay";
+		};
+	};
+};
+
+/* ROM-EG70 */
+&blsp_spi5 {
+	spi_nor: m25p80@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+	};
+};
+
+&cci_i2c0 {
+	eeprom: 24c32@51 {
+		compatible = "onsemi,24c32";
+		reg = <0x51>;
 	};
 };
