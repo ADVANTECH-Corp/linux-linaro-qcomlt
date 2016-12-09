@@ -17,7 +17,6 @@
 #include "msm8916.dtsi"
 #include "advantech-msm8916.dtsi"
 #include "pm8916.dtsi"
-#include "advantech-soc-pins.dtsi"
 #include "advantech-pmic-pins.dtsi"
 #include "msm8916-mdss.dtsi"
 / {
@@ -186,18 +185,8 @@
 			status = "okay";
 		};
 
-		i2c@1b0c000 {
-			label = "I2C2";
-			//status = "okay";
-		};
-
 		i2c@78b8000 {
 			label = "I2C3";
-			status = "okay";
-		};
-
-		i2c@78b7000 {
-			label = "I2C4";
 			status = "okay";
 		};
 
@@ -205,14 +194,6 @@
 		/* On Low speed expansion */
 			label = "LS-SPI0";
 			status = "okay";
-
-			m25p80@0 {
-				#address-cells = <1>;
-				#size-cells = <1>;
-				compatible = "micron,n25qba16";
-				spi-max-frequency = <20000000>;
-				reg = <0>;
-			};
 		};
 
 		leds {
@@ -379,14 +360,6 @@
 	rtc1: s35390a@30 {
 		compatible = "sii,s35390a";
 		reg = <0x30>;
-	};
-};
-
-// I2C2
-&cci_i2c0 {
-	eeprom: 24c32@51 {
-		compatible = "onsemi,24c32";
-		reg = <0x51>;
 	};
 };
 

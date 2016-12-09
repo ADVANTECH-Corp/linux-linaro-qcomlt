@@ -1,0 +1,101 @@
+/*
+ * Copyright (c) 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+#include <dt-bindings/arm/qcom-ids.h>
+#include "advantech-apq8016-sbc.dtsi"
+#include "advantech-epc-r4761-soc-pins.dtsi"
+
+/ {
+	model = "Qualcomm Technologies, Inc. APQ 8016 SBC";
+	compatible = "qcom,apq8016-sbc", "qcom,apq8016", "qcom,sbc";
+	qcom,board-id = <QCOM_BRD_ID(SBC, 1, 0) QCOM_BRD_SUBTYPE_DEFAULT>;
+
+	board {
+		compatible = "proc-board";
+		board-type = "EPC-R4761";
+		board-cpu = "Quad 64-bit";
+	};
+
+	soc {
+		leds {
+			pinctrl-0 = <&msmgpio_leds>,
+					<&pm8916_mpps_leds>;
+
+			led@3 {
+				label = "epc-r4761:led1:yellow";
+				gpios = <&msmgpio 21 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "heartbeat";
+				default-state = "off";
+			};
+
+			led@4 {
+				label = "epc-r4761:led1:green";
+				gpios = <&msmgpio 78 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "none";
+				default-state = "off";
+			};
+
+			led@5 {
+				label = "epc-r4761:led2:yellow";
+				gpios = <&msmgpio 79 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "none";
+				default-state = "off";
+			};
+
+			led@6 {
+				label = "epc-r4761:led2:green";
+				gpios = <&msmgpio 95 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "heartbeat";
+				default-state = "off";
+			};
+
+			led@7 {
+				label = "epc-r4761:led3:yellow";
+				gpios = <&msmgpio 24 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "none";
+				default-state = "on";
+			};
+
+			led@8 {
+				label = "epc-r4761:led3:green";
+				gpios = <&msmgpio 25 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "none";
+				default-state = "off";
+			};
+
+			led@9 {
+				label = "epc-r4761:led4:yellow";
+				gpios = <&msmgpio 26 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "none";
+				default-state = "off";
+			};
+
+			led@10 {
+				label = "epc-r4761:led4:green";
+				gpios = <&msmgpio 27 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "none";
+				default-state = "on";
+			};
+		};
+	};
+};
+
+/* Advantech IAG */
+&blsp_spi5 {
+	device@0 {
+		compatible = "advantech,adamIO";
+		spi-max-frequency = <1000000>; /* 1 MHz */
+		reg = <0>;
+	};
+};
