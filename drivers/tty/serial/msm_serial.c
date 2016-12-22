@@ -190,6 +190,10 @@ struct msm_port {
 	bool			break_detected;
 	struct msm_dma		tx_dma;
 	struct msm_dma		rx_dma;
+#ifdef CONFIG_ARCH_ADVANTECH
+	/* RS-485 fields */
+	struct serial_rs485	rs485;
+#endif
 };
 
 #define UART_TO_MSM(uart_port)	container_of(uart_port, struct msm_port, uart)
@@ -1499,6 +1503,18 @@ static void msm_poll_put_char(struct uart_port *port, unsigned char c)
 }
 #endif
 
+#ifdef CONFIG_ARCH_ADVANTECH
+static int msm_rs485_config(struct uart_port *port,
+			    struct serial_rs485 *rs485conf)
+{
+	rs485conf->flags &= SER_RS485_RTS_ON_SEND | SER_RS485_ENABLED;
+	port->rs485 = *rs485conf;
+	memset(rs485conf->padding, 0, sizeof(rs485conf->padding));
+
+	return 0;
+}
+#endif
+
 static struct uart_ops msm_uart_pops = {
 	.tx_empty = msm_tx_empty,
 	.set_mctrl = msm_set_mctrl,
@@ -1759,6 +1775,11 @@ static int msm_serial_probe(struct platform_device *pdev)
 
 	port = msm_get_port_from_line(line);
 	port->dev = &pdev->dev;
+#ifdef CONFIG_ARCH_ADVANTECH
+	port->rs485_config = msm_rs485_config;
+	port->rs485.flags =
+		SER_RS485_RTS_ON_SEND | SER_RS485_RX_DURING_TX;
+#endif
 	msm_port = UART_TO_MSM(port);
 
 	id = of_match_device(msm_uartdm_table, &pdev->dev);
