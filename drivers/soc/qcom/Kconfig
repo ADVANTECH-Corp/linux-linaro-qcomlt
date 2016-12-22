@@ -114,3 +114,11 @@ config QTI_LNX_GPS_PROXY
 	  Note that this application programming interface is EXPERIMENTAL
 	  and hence SUBJECT TO CHANGE WITHOUT NOTICE while it stabilizes.
 
+config MSM_WATCHDOG_V2
+	bool "MSM Watchdog Support"
+	help
+	  This enables the watchdog module. It causes kernel panic if the
+	  watchdog times out. It allows for detection of cpu hangs and
+	  deadlocks. It does not run during the bootup process, so it will
+	  not catch any early lockups.
+
