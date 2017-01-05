@@ -322,7 +322,7 @@
 			2 &msmgpio 38 0>;
 	interrupt-names = "hc_irq", "pwr_irq", "status_irq";
 	cd-gpios = <&msmgpio 38 0x1>;
-	wp-gpios = <&msmgpio 121 0x1>;
+	wp-gpios = <&msmgpio 121 GPIO_ACTIVE_HIGH>;
 
 	status = "okay";
 };
