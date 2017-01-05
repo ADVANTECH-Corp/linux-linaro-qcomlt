@@ -17,7 +17,9 @@
 #include <linux/module.h>
 #include <linux/of_device.h>
 #include <linux/delay.h>
+#include <linux/mmc/host.h>
 #include <linux/mmc/mmc.h>
+#include <linux/mmc/slot-gpio.h>
 #include <linux/slab.h>
 
 #include "sdhci-pltfm.h"
@@ -462,6 +464,12 @@ static irqreturn_t sdhci_msm_pwr_irq(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
+//[Advantech] Add support for WP
+static unsigned int sdhci_get_ro(struct sdhci_host *host)
+{
+	return mmc_gpio_get_ro(host->mmc);
+}
+
 static const struct of_device_id sdhci_msm_dt_match[] = {
 	{ .compatible = "qcom,sdhci-msm-v4" },
 	{},
@@ -472,6 +480,7 @@ MODULE_DEVICE_TABLE(of, sdhci_msm_dt_match);
 static const struct sdhci_ops sdhci_msm_ops = {
 	.platform_execute_tuning = sdhci_msm_execute_tuning,
 	.reset = sdhci_reset,
+	.get_ro = sdhci_get_ro,
 	.set_clock = sdhci_set_clock,
 	.set_bus_width = sdhci_set_bus_width,
 	.set_uhs_signaling = sdhci_set_uhs_signaling,
