@@ -256,6 +256,9 @@ static int m25p_remove(struct spi_device *spi)
  * keep them available as module aliases for existing platforms.
  */
 static const struct spi_device_id m25p_ids[] = {
+#ifdef CONFIG_ARCH_ADVANTECH
+	{"spi-nor"},
+#endif
 	/*
 	 * Entries not used in DTs that should be safe to drop after replacing
 	 * them with "nor-jedec" in platform data.
