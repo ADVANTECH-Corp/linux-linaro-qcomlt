@@ -103,13 +103,6 @@
 			};
 		};
 	};
-
-	/* Enable SPI CS function */
-	spi5_default {
-		pinmux_cs {
-			function = "blsp_spi5";
-		};
-	};
 };
 
 /* msm8916.dtsi */

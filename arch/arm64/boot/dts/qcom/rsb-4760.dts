@@ -42,6 +42,9 @@
 
 /* ROM-EG70 */
 &blsp_spi5 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&msmgpio 18 GPIO_ACTIVE_HIGH>;
+	status = "okay";
 	spi_nor: m25p80@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
