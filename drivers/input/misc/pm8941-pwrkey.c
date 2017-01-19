@@ -44,6 +44,14 @@
 #define PON_DBC_CTL			0x71
 #define  PON_DBC_DELAY_MASK		0x7
 
+#define PON_RESIN_N_RESET_S1_TIMER	0x44
+#define  PON_S1_TIMER_MASK		0x0f
+#define PON_RESIN_N_RESET_S2_TIMER	0x45
+#define  PON_S2_TIMER_MASK		0x07
+#define PON_RESIN_N_RESET_S2_CTL	0x46
+#define  PON_S2_CNTL_TYPE_MASK		0x0f
+#define PON_RESIN_N_RESET_S2_CTL2	0x47
+#define  PON_S2_RESET_ENABLE		BIT(7)
 
 struct pm8941_pwrkey {
 	struct device *dev;
@@ -213,6 +221,26 @@ static void pm8941_resin_setup(struct platform_device *pdev,
 					  "pm8941_resin", pwrkey);
 	if (error)
 		dev_err(&pdev->dev, "failed requesting IRQ: %d\n", error);
+
+#ifdef CONFIG_ARCH_ADVANTECH
+	/* Enable RESIN_N S1 & S2 reset for external watchdog */
+	error = regmap_update_bits(pwrkey->regmap,
+				   pwrkey->baseaddr + PON_RESIN_N_RESET_S1_TIMER,
+				   PON_S1_TIMER_MASK, 0x2);
+
+	error = regmap_update_bits(pwrkey->regmap,
+				   pwrkey->baseaddr + PON_RESIN_N_RESET_S2_TIMER,
+				   PON_S2_TIMER_MASK, 0x2);
+
+	error = regmap_update_bits(pwrkey->regmap,
+				   pwrkey->baseaddr + PON_RESIN_N_RESET_S2_CTL,
+				   PON_S2_CNTL_TYPE_MASK, 0x1);
+
+	error = regmap_update_bits(pwrkey->regmap,
+				   pwrkey->baseaddr + PON_RESIN_N_RESET_S2_CTL2,
+				   PON_S2_RESET_ENABLE, PON_S2_RESET_ENABLE);
+	usleep_range(100, 1000);
+#endif
 }
 
 static int pm8941_pwrkey_probe(struct platform_device *pdev)
