@@ -100,6 +100,11 @@ config VIDEO_OMAP3_DEBUG
 	---help---
 	  Enable debug messages on OMAP 3 camera controller driver.
 
+config VIDEO_QCOM_CAMSS
+        tristate "Qualcomm 8x16 V4L2 Camera Subsystem driver"
+        depends on ARCH_QCOM && VIDEO_V4L2
+        select VIDEOBUF2_DMA_CONTIG
+
 config VIDEO_S3C_CAMIF
 	tristate "Samsung S3C24XX/S3C64XX SoC Camera Interface driver"
 	depends on VIDEO_V4L2 && I2C && VIDEO_V4L2_SUBDEV_API
@@ -119,7 +124,7 @@ source "drivers/media/platform/exynos4-is/Kconfig"
 source "drivers/media/platform/s5p-tv/Kconfig"
 source "drivers/media/platform/am437x/Kconfig"
 source "drivers/media/platform/xilinx/Kconfig"
-source "drivers/media/platform/msm/Kconfig"
+source "drivers/media/platform/qcom/Kconfig"
 
 endif # V4L_PLATFORM_DRIVERS
 
@@ -272,6 +277,16 @@ config VIDEO_TI_VPE_DEBUG
 	depends on VIDEO_TI_VPE
 	---help---
 	  Enable debug messages on VPE driver.
+
+config VIDEO_QCOM_VENUS
+        tristate "Qualcomm Venus V4L2 encoder/decoder driver"
+        depends on ARCH_QCOM && VIDEO_V4L2
+        depends on IOMMU_DMA
+        depends on QCOM_VENUS_PIL || QCOM_TZ_PIL
+        select VIDEOBUF2_DMA_SG
+        select V4L2_MEM2MEM_DEV
+	---help---
+	  This is a V4L2 driver for Qualcomm Venus video accelerator
 
 endif # V4L_MEM2MEM_DRIVERS
 
