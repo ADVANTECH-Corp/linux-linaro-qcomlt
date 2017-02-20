@@ -4,7 +4,7 @@
 &msmgpio {
 
 	pinctrl-names = "default";
-	pinctrl-0 = <&gpio_group1 &gpio_group2 &m2_3g>;
+	pinctrl-0 = <&gpio_group1 &gpio_group2 &m2_3g_out &m2_3g_in>;
 
 	gpio_group1: gpio_group1 {
 		pinmux {
@@ -134,7 +134,7 @@
 		};
 	};
 
-	m2_3g: m2_3g {
+	m2_3g_out: m2_3g_out {
 		pinmux {
 			function = "gpio";
 			pins = "gpio70", "gpio71", "gpio74", "gpio75";
@@ -144,6 +144,19 @@
 			drive-strength = <8>;
 			bias-disable;
 			output-high;
+		};
+	};
+
+	m2_3g_in: m2_3g_in {
+		pinmux {
+			function = "gpio";
+			pins = "gpio72", "gpio76";
+		};
+		pinconf {
+			pins = "gpio72", "gpio76";
+			drive-strength = <8>;
+			input-enable;
+			bias-pull-up;
 		};
 	};
 };
