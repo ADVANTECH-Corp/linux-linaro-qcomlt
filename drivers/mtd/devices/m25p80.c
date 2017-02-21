@@ -257,7 +257,7 @@ static int m25p_remove(struct spi_device *spi)
  */
 static const struct spi_device_id m25p_ids[] = {
 #ifdef CONFIG_ARCH_ADVANTECH
-	{"spi-nor"},
+	{"n25qba16"},  {"n25qbb16"},
 #endif
 	/*
 	 * Entries not used in DTs that should be safe to drop after replacing
