@@ -286,6 +286,15 @@
 	};
 };
 
+&pm8916_0 {
+	pmic_wd: wdt@800 {
+		compatible = "qcom,pmic-wd";
+		reg = <0x800>;
+		timeout-sec = <30>;
+		status = "okay";
+	};
+};
+
 //&spmi_pon {
 	// Overwrite RESETIN_N keyboard scan code
 //	linux,code = <KEY_VOLUMEDOWN>;
@@ -347,16 +356,6 @@
 
 // I2C1
 &blsp_i2c6 {
-	wdt: wdt@29 {
-		compatible = "ti,adv-wdt-i2c";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_wdt_en &pinctrl_wdt_ping>;
-		status = "okay";
-		wdt-en = <&msmgpio 98 0>;
-		wdt-ping = <&msmgpio 111 0>;
-		reg = <0x29>;
-	};
-
 	rtc1: s35390a@30 {
 		compatible = "sii,s35390a";
 		reg = <0x30>;
