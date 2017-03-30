@@ -28,7 +28,7 @@
 		};
 		pinconf {
 			pins = "gpio28", "gpio33", "gpio34", "gpio35",
-				"gpio36", "gpio69", "gpio107", "gpio108";
+				"gpio36", "gpio69", "gpio73", "gpio108";
 			drive-strength = <16>;
 			bias-disable;
 		};
