@@ -50,9 +50,9 @@
 	};
 };
 
-&cci_i2c0 {
-	eeprom: 24c32@51 {
+&blsp_i2c3 {
+	eeprom: 24c32@50 {
 		compatible = "onsemi,24c32";
-		reg = <0x51>;
+		reg = <0x50>;
 	};
 };
