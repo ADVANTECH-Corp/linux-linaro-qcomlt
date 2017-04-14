@@ -203,16 +203,16 @@
 			compatible = "gpio-leds";
 
 			led@1 {
-				label = "apq8016-sbc:yellow:wlan";
+				label = "apq8016-sbc:green:wlan";
 				gpios = <&pm8916_mpps 2 GPIO_ACTIVE_HIGH>;
-				linux,default-trigger = "wlan";
+				linux,default-trigger = "phy0rx";
 				default-state = "off";
 			};
 
 			led@2 {
-				label = "apq8016-sbc:blue:bt";
+				label = "apq8016-sbc:yellow:bt";
 				gpios = <&pm8916_mpps 3 GPIO_ACTIVE_HIGH>;
-				linux,default-trigger = "bt";
+				linux,default-trigger = "hci0-tx_rx";
 				default-state = "off";
 			};
 		};
