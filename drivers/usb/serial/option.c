@@ -233,6 +233,9 @@ static void option_instat_callback(struct urb *urb);
 #define BANDRICH_PRODUCT_1012			0x1012
 
 #define QUALCOMM_VENDOR_ID			0x05C6
+#ifdef CONFIG_ARCH_ADVANTECH
+#define QUECTEL_VENDOR_ID			0x2C7C
+#endif
 
 #define CMOTECH_VENDOR_ID			0x16d8
 #define CMOTECH_PRODUCT_6001			0x6001
@@ -1161,6 +1164,10 @@ static const struct usb_device_id option_ids[] = {
 	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x9000)}, /* SIMCom SIM5218 */
 	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x9003), /* Quectel UC20 */
 	  .driver_info = (kernel_ulong_t)&net_intf4_blacklist },
+#ifdef CONFIG_ARCH_ADVANTECH
+        { USB_DEVICE(QUECTEL_VENDOR_ID, 0x0125), /* Quectel EC25/EC20 R2.0*/
+	  .driver_info = (kernel_ulong_t)&net_intf4_blacklist },
+#endif
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6003),
@@ -2034,6 +2041,7 @@ static struct usb_serial_driver option_1port_device = {
 #ifdef CONFIG_PM
 	.suspend           = usb_wwan_suspend,
 	.resume            = usb_wwan_resume,
+	.reset_resume	   = usb_wwan_resume,
 #endif
 };
 
