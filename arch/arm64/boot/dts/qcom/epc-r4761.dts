@@ -12,14 +12,12 @@
  */
 
 /dts-v1/;
-#include <dt-bindings/arm/qcom-ids.h>
 #include "advantech-apq8016-sbc.dtsi"
 #include "advantech-epc-r4761-soc-pins.dtsi"
 
 / {
 	model = "Qualcomm Technologies, Inc. APQ 8016 SBC";
 	compatible = "qcom,apq8016-sbc", "qcom,apq8016", "qcom,sbc";
-	qcom,board-id = <QCOM_BRD_ID(SBC, 1, 0) QCOM_BRD_SUBTYPE_DEFAULT>;
 
 	board {
 		compatible = "proc-board";
