@@ -826,8 +826,8 @@ static int smsc75xx_set_mac_address(struct usbnet *dev)
 }
 
 // [Advantech] Function to write PHY registers for test modes
-static int smsc75xx_proc_write(struct file *file, const char __user * buffer,
-				unsigned long count, loff_t *f_pos)
+static ssize_t smsc75xx_proc_write(struct file *file, const char __user * buffer,
+				size_t count, loff_t *f_pos)
 {
 	char cmd[8];
 	u16 val;
