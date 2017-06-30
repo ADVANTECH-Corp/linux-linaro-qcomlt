@@ -122,6 +122,7 @@
 						regulator-min-microvolt = <3300000>;
 						regulator-max-microvolt = <3300000>;
 
+						regulator-always-on;
 					};
 					l12 {
 						regulator-min-microvolt = <3300000>;
@@ -313,7 +314,7 @@
 };
 
 &sdhc_2 {
-	vmmc-supply = <&pm8916_l11>;
+	//vmmc-supply = <&pm8916_l11>;
 	vqmmc-supply = <&pm8916_l12>;
 
 	pinctrl-names = "default", "sleep";

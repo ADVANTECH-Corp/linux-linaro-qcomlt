@@ -540,6 +540,13 @@ static int rpm_reg_probe(struct platform_device *pdev)
 
 		config.dev = &pdev->dev;
 		config.driver_data = vreg;
+
+		// [Advantech] Keep L11 alive for usage stability
+		if (strncmp(reg->name, "l11", 3) == 0) {
+			pr_info("%s: do not handle l11!\n", __func__);
+			continue;
+		}
+
 		rdev = devm_regulator_register(&pdev->dev, &vreg->desc, &config);
 		if (IS_ERR(rdev)) {
 			dev_err(&pdev->dev, "failed to register %s\n", reg->name);
