@@ -34,6 +34,9 @@
 #define CAMSS_CSID_NUM 2
 #define CAMSS_CSIPHY_NUM 2
 
+#define CAMSS_CLOCK_MARGIN_NUMERATOR 105
+#define CAMSS_CLOCK_MARGIN_DENOMINATOR 100
+
 #define to_camss(ptr_module)	\
 	container_of(ptr_module, struct camss, ptr_module)
 
@@ -55,7 +58,7 @@
 struct resources {
 	char *regulator[CAMSS_RES_MAX];
 	char *clock[CAMSS_RES_MAX];
-	s32 clock_rate[CAMSS_RES_MAX];
+	u32 clock_rate[CAMSS_RES_MAX][CAMSS_RES_MAX];
 	char *reg[CAMSS_RES_MAX];
 	char *interrupt[CAMSS_RES_MAX];
 };
@@ -89,8 +92,17 @@ struct camss_async_subdev {
 	struct v4l2_async_subdev asd;
 };
 
-int camss_enable_clocks(int nclocks, struct clk **clock, struct device *dev);
-void camss_disable_clocks(int nclocks, struct clk **clock);
+struct camss_clock {
+	struct clk *clk;
+	const char *name;
+	u32 *freq;
+	u32 nfreqs;
+};
+
+int camss_enable_clocks(int nclocks, struct camss_clock *clock,
+			struct device *dev);
+void camss_disable_clocks(int nclocks, struct camss_clock *clock);
+int camss_get_pixel_clock(struct media_entity *entity, u32 *pixel_clock);
 void camss_delete(struct camss *camss);
 
 #endif /* QC_MSM_CAMSS_H */

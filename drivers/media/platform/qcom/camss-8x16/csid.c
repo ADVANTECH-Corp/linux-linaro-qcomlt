@@ -68,213 +68,137 @@ static const struct {
 	u8 data_type;
 	u8 decode_format;
 	u8 uncompr_bpp;
+	u8 spp; /* bus samples per pixel */
 } csid_input_fmts[] = {
 	{
 		MEDIA_BUS_FMT_UYVY8_2X8,
 		MEDIA_BUS_FMT_UYVY8_2X8,
 		DATA_TYPE_YUV422_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		16
+		8,
+		2
 	},
 	{
 		MEDIA_BUS_FMT_VYUY8_2X8,
 		MEDIA_BUS_FMT_VYUY8_2X8,
 		DATA_TYPE_YUV422_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		16
+		8,
+		2
 	},
 	{
 		MEDIA_BUS_FMT_YUYV8_2X8,
 		MEDIA_BUS_FMT_YUYV8_2X8,
 		DATA_TYPE_YUV422_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		16
+		8,
+		2
 	},
 	{
 		MEDIA_BUS_FMT_YVYU8_2X8,
 		MEDIA_BUS_FMT_YVYU8_2X8,
 		DATA_TYPE_YUV422_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		16
+		8,
+		2
 	},
 	{
 		MEDIA_BUS_FMT_SBGGR8_1X8,
 		MEDIA_BUS_FMT_SBGGR8_1X8,
 		DATA_TYPE_RAW_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		8
+		8,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SGBRG8_1X8,
 		MEDIA_BUS_FMT_SGBRG8_1X8,
 		DATA_TYPE_RAW_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		8
+		8,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SGRBG8_1X8,
 		MEDIA_BUS_FMT_SGRBG8_1X8,
 		DATA_TYPE_RAW_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		8
+		8,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SRGGB8_1X8,
 		MEDIA_BUS_FMT_SRGGB8_1X8,
 		DATA_TYPE_RAW_8BIT,
 		DECODE_FORMAT_UNCOMPRESSED_8_BIT,
-		8
+		8,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SBGGR10_1X10,
 		MEDIA_BUS_FMT_SBGGR10_1X10,
 		DATA_TYPE_RAW_10BIT,
 		DECODE_FORMAT_UNCOMPRESSED_10_BIT,
-		10
+		10,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SGBRG10_1X10,
 		MEDIA_BUS_FMT_SGBRG10_1X10,
 		DATA_TYPE_RAW_10BIT,
 		DECODE_FORMAT_UNCOMPRESSED_10_BIT,
-		10
+		10,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SGRBG10_1X10,
 		MEDIA_BUS_FMT_SGRBG10_1X10,
 		DATA_TYPE_RAW_10BIT,
 		DECODE_FORMAT_UNCOMPRESSED_10_BIT,
-		10
+		10,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SRGGB10_1X10,
 		MEDIA_BUS_FMT_SRGGB10_1X10,
 		DATA_TYPE_RAW_10BIT,
 		DECODE_FORMAT_UNCOMPRESSED_10_BIT,
-		10
+		10,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SBGGR12_1X12,
 		MEDIA_BUS_FMT_SBGGR12_1X12,
 		DATA_TYPE_RAW_12BIT,
 		DECODE_FORMAT_UNCOMPRESSED_12_BIT,
-		12
+		12,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SGBRG12_1X12,
 		MEDIA_BUS_FMT_SGBRG12_1X12,
 		DATA_TYPE_RAW_12BIT,
 		DECODE_FORMAT_UNCOMPRESSED_12_BIT,
-		12
+		12,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SGRBG12_1X12,
 		MEDIA_BUS_FMT_SGRBG12_1X12,
 		DATA_TYPE_RAW_12BIT,
 		DECODE_FORMAT_UNCOMPRESSED_12_BIT,
-		12
+		12,
+		1
 	},
 	{
 		MEDIA_BUS_FMT_SRGGB12_1X12,
 		MEDIA_BUS_FMT_SRGGB12_1X12,
 		DATA_TYPE_RAW_12BIT,
 		DECODE_FORMAT_UNCOMPRESSED_12_BIT,
-		12
+		12,
+		1
 	}
 };
-
-/*
- * csid_isr - CSID module interrupt handler
- * @irq: Interrupt line
- * @dev: CSID device
- *
- * Return IRQ_HANDLED on success
- */
-static irqreturn_t csid_isr(int irq, void *dev)
-{
-	struct csid_device *csid = dev;
-	u32 value;
-
-	value = readl_relaxed(csid->base + CAMSS_CSID_IRQ_STATUS);
-	writel_relaxed(value, csid->base + CAMSS_CSID_IRQ_CLEAR_CMD);
-
-	if ((value >> 11) & 0x1)
-		complete(&csid->reset_complete);
-
-	return IRQ_HANDLED;
-}
-
-/*
- * csid_reset - Trigger reset on CSID module and wait to complete
- * @csid: CSID device
- *
- * Return 0 on success or a negative error code otherwise
- */
-static int csid_reset(struct csid_device *csid)
-{
-	unsigned long time;
-
-	reinit_completion(&csid->reset_complete);
-
-	writel_relaxed(0x7fff, csid->base + CAMSS_CSID_RST_CMD);
-
-	time = wait_for_completion_timeout(&csid->reset_complete,
-		msecs_to_jiffies(CSID_RESET_TIMEOUT_MS));
-	if (!time) {
-		dev_err(to_device_index(csid, csid->id),
-			"CSID reset timeout\n");
-		return -EIO;
-	}
-
-	return 0;
-}
-
-/*
- * csid_set_power - Power on/off CSID module
- * @sd: CSID V4L2 subdevice
- * @on: Requested power state
- *
- * Return 0 on success or a negative error code otherwise
- */
-static int csid_set_power(struct v4l2_subdev *sd, int on)
-{
-	struct csid_device *csid = v4l2_get_subdevdata(sd);
-	struct device *dev = to_device_index(csid, csid->id);
-	int ret;
-
-	if (on) {
-		u32 hw_version;
-
-		ret = regulator_enable(csid->vdda);
-		if (ret < 0)
-			return ret;
-
-		ret = camss_enable_clocks(csid->nclocks, csid->clock, dev);
-		if (ret < 0) {
-			regulator_disable(csid->vdda);
-			return ret;
-		}
-
-		enable_irq(csid->irq);
-
-		ret = csid_reset(csid);
-		if (ret < 0) {
-			disable_irq(csid->irq);
-			camss_disable_clocks(csid->nclocks, csid->clock);
-			regulator_disable(csid->vdda);
-			return ret;
-		}
-
-		hw_version = readl_relaxed(csid->base + CAMSS_CSID_HW_VERSION);
-		dev_dbg(dev, "CSID HW Version = 0x%08x\n", hw_version);
-	} else {
-		disable_irq(csid->irq);
-		camss_disable_clocks(csid->nclocks, csid->clock);
-		ret = regulator_disable(csid->vdda);
-	}
-
-	return ret;
-}
 
 /*
  * csid_get_uncompressed - map media bus format to uncompressed media bus format
@@ -345,6 +269,183 @@ static u8 csid_get_bpp(u32 code)
 }
 
 /*
+ * csid_get_spp - map media bus format to bus samples per pixel
+ * @code: media bus format code
+ *
+ * Return number of bus samples per pixel
+ */
+static u8 csid_get_spp(u32 code)
+{
+	unsigned int i;
+
+	for (i = 0; i < ARRAY_SIZE(csid_input_fmts); i++)
+		if (code == csid_input_fmts[i].uncompressed)
+			break;
+
+	return csid_input_fmts[i].spp;
+}
+
+/*
+ * csid_isr - CSID module interrupt handler
+ * @irq: Interrupt line
+ * @dev: CSID device
+ *
+ * Return IRQ_HANDLED on success
+ */
+static irqreturn_t csid_isr(int irq, void *dev)
+{
+	struct csid_device *csid = dev;
+	u32 value;
+
+	value = readl_relaxed(csid->base + CAMSS_CSID_IRQ_STATUS);
+	writel_relaxed(value, csid->base + CAMSS_CSID_IRQ_CLEAR_CMD);
+
+	if ((value >> 11) & 0x1)
+		complete(&csid->reset_complete);
+
+	return IRQ_HANDLED;
+}
+
+/*
+ * csid_set_clock_rates - Calculate and set clock rates on CSID module
+ * @csiphy: CSID device
+ */
+static int csid_set_clock_rates(struct csid_device *csid)
+{
+	struct device *dev = to_device_index(csid, csid->id);
+	u32 pixel_clock;
+	int i, j;
+	int ret;
+
+	ret = camss_get_pixel_clock(&csid->subdev.entity, &pixel_clock);
+	if (ret)
+		pixel_clock = 0;
+
+	for (i = 0; i < csid->nclocks; i++) {
+		struct camss_clock *clock = &csid->clock[i];
+
+		if (!strcmp(clock->name, "csi0_clk") ||
+			!strcmp(clock->name, "csi1_clk")) {
+			u8 bpp = csid_get_bpp(
+					csid->fmt[MSM_CSIPHY_PAD_SINK].code);
+			u8 num_lanes = csid->phy.lane_cnt;
+			u64 min_rate = pixel_clock * bpp / (2 * num_lanes * 4);
+			unsigned long rate;
+
+			min_rate = (min_rate * CAMSS_CLOCK_MARGIN_NUMERATOR) /
+						CAMSS_CLOCK_MARGIN_DENOMINATOR;
+
+			for (j = 0; j < clock->nfreqs; j++)
+				if (min_rate < clock->freq[j])
+					break;
+
+			if (j == clock->nfreqs) {
+				dev_err(dev,
+					"Pixel clock is too high for CSID\n");
+				return -EINVAL;
+			}
+
+			/* if sensor pixel clock is not available */
+			/* set highest possible CSID clock rate */
+			if (min_rate == 0)
+				j = clock->nfreqs - 1;
+
+			rate = clk_round_rate(clock->clk, clock->freq[j]);
+			if (rate < 0) {
+				dev_err(dev, "clk round rate failed\n");
+				return -EINVAL;
+			}
+
+			ret = clk_set_rate(clock->clk, rate);
+			if (ret < 0) {
+				dev_err(dev, "clk set rate failed\n");
+				return ret;
+			}
+		}
+	}
+
+	return 0;
+}
+
+/*
+ * csid_reset - Trigger reset on CSID module and wait to complete
+ * @csid: CSID device
+ *
+ * Return 0 on success or a negative error code otherwise
+ */
+static int csid_reset(struct csid_device *csid)
+{
+	unsigned long time;
+
+	reinit_completion(&csid->reset_complete);
+
+	writel_relaxed(0x7fff, csid->base + CAMSS_CSID_RST_CMD);
+
+	time = wait_for_completion_timeout(&csid->reset_complete,
+		msecs_to_jiffies(CSID_RESET_TIMEOUT_MS));
+	if (!time) {
+		dev_err(to_device_index(csid, csid->id),
+			"CSID reset timeout\n");
+		return -EIO;
+	}
+
+	return 0;
+}
+
+/*
+ * csid_set_power - Power on/off CSID module
+ * @sd: CSID V4L2 subdevice
+ * @on: Requested power state
+ *
+ * Return 0 on success or a negative error code otherwise
+ */
+static int csid_set_power(struct v4l2_subdev *sd, int on)
+{
+	struct csid_device *csid = v4l2_get_subdevdata(sd);
+	struct device *dev = to_device_index(csid, csid->id);
+	int ret;
+
+	if (on) {
+		u32 hw_version;
+
+		ret = regulator_enable(csid->vdda);
+		if (ret < 0)
+			return ret;
+
+		ret = csid_set_clock_rates(csid);
+		if (ret < 0) {
+			regulator_disable(csid->vdda);
+			return ret;
+		}
+
+		ret = camss_enable_clocks(csid->nclocks, csid->clock, dev);
+		if (ret < 0) {
+			regulator_disable(csid->vdda);
+			return ret;
+		}
+
+		enable_irq(csid->irq);
+
+		ret = csid_reset(csid);
+		if (ret < 0) {
+			disable_irq(csid->irq);
+			camss_disable_clocks(csid->nclocks, csid->clock);
+			regulator_disable(csid->vdda);
+			return ret;
+		}
+
+		hw_version = readl_relaxed(csid->base + CAMSS_CSID_HW_VERSION);
+		dev_dbg(dev, "CSID HW Version = 0x%08x\n", hw_version);
+	} else {
+		disable_irq(csid->irq);
+		camss_disable_clocks(csid->nclocks, csid->clock);
+		ret = regulator_disable(csid->vdda);
+	}
+
+	return ret;
+}
+
+/*
  * csid_set_stream - Enable/disable streaming on CSID module
  * @sd: CSID V4L2 subdevice
  * @enable: Requested streaming state
@@ -381,10 +482,12 @@ static int csid_set_stream(struct v4l2_subdev *sd, int enable)
 
 		if (tg->enabled) {
 			/* Config Test Generator */
-			u8 bpp = csid_get_bpp(csid->fmt[MSM_CSID_PAD_SRC].code);
-			u32 num_bytes_per_line =
-				csid->fmt[MSM_CSID_PAD_SRC].width * bpp / 8;
-			u32 num_lines = csid->fmt[MSM_CSID_PAD_SRC].height;
+			struct v4l2_mbus_framefmt *f =
+					&csid->fmt[MSM_CSID_PAD_SRC];
+			u8 bpp = csid_get_bpp(f->code);
+			u8 spp = csid_get_spp(f->code);
+			u32 num_bytes_per_line = f->width * bpp * spp / 8;
+			u32 num_lines = f->height;
 
 			/* 31:24 V blank, 23:13 H blank, 3:2 num of active DT */
 			/* 1:0 VC */
@@ -786,7 +889,7 @@ int msm_csid_subdev_init(struct csid_device *csid,
 	struct platform_device *pdev = container_of(dev, struct platform_device,
 						    dev);
 	struct resource *r;
-	int i;
+	int i, j;
 	int ret;
 
 	csid->id = id;
@@ -833,25 +936,30 @@ int msm_csid_subdev_init(struct csid_device *csid,
 		return -ENOMEM;
 
 	for (i = 0; i < csid->nclocks; i++) {
-		csid->clock[i] = devm_clk_get(dev, res->clock[i]);
-		if (IS_ERR(csid->clock[i]))
-			return PTR_ERR(csid->clock[i]);
+		struct camss_clock *clock = &csid->clock[i];
 
-		if (res->clock_rate[i]) {
-			long clk_rate = clk_round_rate(csid->clock[i],
-						       res->clock_rate[i]);
-			if (clk_rate < 0) {
-				dev_err(to_device_index(csid, csid->id),
-					"clk round rate failed\n");
-				return -EINVAL;
-			}
-			ret = clk_set_rate(csid->clock[i], clk_rate);
-			if (ret < 0) {
-				dev_err(to_device_index(csid, csid->id),
-					"clk set rate failed\n");
-				return ret;
-			}
+		clock->clk = devm_clk_get(dev, res->clock[i]);
+		if (IS_ERR(clock->clk))
+			return PTR_ERR(clock->clk);
+
+		clock->name = res->clock[i];
+
+		clock->nfreqs = 0;
+		while (res->clock_rate[i][clock->nfreqs])
+			clock->nfreqs++;
+
+		if (!clock->nfreqs) {
+			clock->freq = NULL;
+			continue;
 		}
+
+		clock->freq = devm_kzalloc(dev, clock->nfreqs *
+					   sizeof(*clock->freq), GFP_KERNEL);
+		if (!clock->freq)
+			return -ENOMEM;
+
+		for (j = 0; j < clock->nfreqs; j++)
+			clock->freq[j] = res->clock_rate[i][j];
 	}
 
 	/* Regulator */
@@ -1037,6 +1145,7 @@ int msm_csid_register_entity(struct csid_device *csid,
 	pads[MSM_CSID_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
 	pads[MSM_CSID_PAD_SRC].flags = MEDIA_PAD_FL_SOURCE;
 
+	sd->entity.function = MEDIA_ENT_F_IO_V4L;
 	sd->entity.ops = &csid_media_ops;
 	ret = media_entity_pads_init(&sd->entity, MSM_CSID_PADS_NUM, pads);
 	if (ret < 0) {
