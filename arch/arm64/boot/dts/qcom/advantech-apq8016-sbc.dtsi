@@ -151,7 +151,7 @@
 		};
 
 		sdhci@07864000 {
-			vmmc-supply = <&pm8916_l11>;
+			//vmmc-supply = <&pm8916_l11>;
 			vqmmc-supply = <&pm8916_l12>;
 
 			pinctrl-names = "default", "sleep";
@@ -437,6 +437,8 @@
 	l11 {
 		regulator-min-microvolt = <1750000>;
 		regulator-max-microvolt = <3337000>;
+
+		regulator-always-on;
 	};
 
 	l12 {
