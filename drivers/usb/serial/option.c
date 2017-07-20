@@ -1165,8 +1165,10 @@ static const struct usb_device_id option_ids[] = {
 	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x9003), /* Quectel UC20 */
 	  .driver_info = (kernel_ulong_t)&net_intf4_blacklist },
 #ifdef CONFIG_ARCH_ADVANTECH
-        { USB_DEVICE(QUECTEL_VENDOR_ID, 0x0125), /* Quectel EC25/EC20 R2.0*/
-	  .driver_info = (kernel_ulong_t)&net_intf4_blacklist },
+	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x9090)}, /* Quectel UC15 */
+	{ USB_DEVICE(QUALCOMM_VENDOR_ID, 0x9215)}, /* Quectel EC20 */
+	{ USB_DEVICE(QUECTEL_VENDOR_ID, 0x0125)}, /* Quectel EC25 */
+	{ USB_DEVICE(QUECTEL_VENDOR_ID, 0x0121)}, /* Quectel EC21 */
 #endif
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_6001) },
 	{ USB_DEVICE(CMOTECH_VENDOR_ID, CMOTECH_PRODUCT_CMU_300) },
