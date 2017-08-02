@@ -4,7 +4,7 @@
 &msmgpio {
 
 	pinctrl-names = "default";
-	pinctrl-0 = <&gpio_group1 &gpio_group2 &m2_3g_out &m2_3g_in>;
+	pinctrl-0 = <&gpio_group1 &gpio_group2 &gpio_rs232_high &gpio_rs232_low &m2_3g_out &m2_3g_in>;
 
 	gpio_group1: gpio_group1 {
 		pinmux {
@@ -33,6 +33,35 @@
 			bias-disable;
 		};
 	};
+
+	gpio_rs232_high: gpio_rs232_high {
+                pinmux {
+                        function = "gpio";
+                        pins = "gpio99";
+                };
+                pinconf {
+                        pins = "gpio99";
+                        drive-strength = <16>;
+                        bias-disable;
+			output-high;
+                };
+
+	};
+
+        gpio_rs232_low: gpio_rs232_low {
+                pinmux {
+                        function = "gpio";
+                        pins = "gpio100";
+                };
+                pinconf {
+                        pins = "gpio100";
+                        drive-strength = <16>;
+                        bias-disable;
+                        output-low;
+                };
+
+        };
+
 
 	usb_id_default: usb-id-default {
 		pinmux {
