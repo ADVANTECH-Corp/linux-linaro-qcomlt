@@ -468,7 +468,7 @@ error:
 
 	while ((entity_err = media_entity_graph_walk_next(graph))) {
 		/* don't let the stream_count go negative */
-		if (entity->stream_count > 0) {
+		if (entity_err->stream_count > 0) {
 			entity_err->stream_count--;
 			if (entity_err->stream_count == 0)
 				entity_err->pipe = NULL;
@@ -854,7 +854,7 @@ media_entity_find_link(struct media_pad *source, struct media_pad *sink)
 }
 EXPORT_SYMBOL_GPL(media_entity_find_link);
 
-struct media_pad *media_entity_remote_pad(struct media_pad *pad)
+struct media_pad *media_entity_remote_pad(const struct media_pad *pad)
 {
 	struct media_link *link;
 
